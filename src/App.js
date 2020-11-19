@@ -1,23 +1,30 @@
-import logo from './logo.svg';
+import ClientCard from './ClientCard';
+import axios from 'axios';
 import './App.css';
+import React, {useState, useEffect} from 'react'
 
 function App() {
+
+  const [clients, setClients] = useState([])
+  const [filter, setFilter] = useState('')
+
+  useEffect( () => {
+    async function callApi () {
+      const {data} =  await axios.get('http://localhost:5000/api/users')
+      console.log({response: data});
+      setClients(data)
+    }
+    callApi()
+  }, [])
+
+  const clientList = () => clients
+    .filter(client => client.name.toLowerCase().includes(filter.toLowerCase()))
+    .map(client => <ClientCard key={client.id} client={client} />)
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input onChange={e=>setFilter(e.target.value)} value={filter}/>
+      {clientList()}
     </div>
   );
 }
